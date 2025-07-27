@@ -76,6 +76,13 @@ Please refer to this [video](docs/debug_with_visual_studio-code.mp4) for step-by
 limactl show-ssh $VM_NAME
 ```
 
+### Configure the remote
+![open folder](docs/open_folder_in_remote.png)
+![condigure dev/linux](docs/select_dev_linux.png)
+
+
+
+
 ### Find an interesting break point by looking at the net_rx_action function graph
 
 Let's find a break point in the networking stack by running a `trace-cmd`
