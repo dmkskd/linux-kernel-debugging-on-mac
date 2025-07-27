@@ -65,7 +65,7 @@ Once the script has completed successfully, you can familiarise with the kernel 
 
 ## Debugging using Visual Studio Code
 
-Please refer to this [video](docs/debug_with_visual_studio-code.mp4) for step-by-step instructions
+**Please refer to this [video](docs/debug_with_visual_studio-code.mp4) for step-by-step instructions**. In the video, instructions on how to configure the remote to dev/linux are missing and screenshots are provided.
 
 ### Launch Visual Studio Code
 
