@@ -77,8 +77,13 @@ limactl show-ssh $VM_NAME
 ```
 
 ### Configure the remote
-![open folder](docs/open_folder_in_remote.png)
-![condigure dev/linux](docs/select_dev_linux.png)
+
+####  open folder
+<img src="docs/open_folder_in_remote.png" alt="Alt Text" width="200"></image>
+
+#### select dev/linux
+
+![configure dev/linux](docs/select_dev_linux.png)
 
 
 
