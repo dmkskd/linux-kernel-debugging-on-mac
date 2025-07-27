@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -euo pipefail
 
 step() {
   local message="$1"
@@ -28,10 +29,11 @@ fi
 step "Creating vm ${VM_NAME} with template ${VM_TEMPLATE} using ${VM_CPUS} CPUs, ${VM_MEMORY_GB}GB memory and ${VM_DISK_GB}GB disk"
 
 if limactl list | grep -q "${VM_NAME}"; then
-    echo "VM ${VM_NAME} already exists. Skipping creation step."
+    echo "VM ${VM_NAME} already exists. Exiting as the script is not idempotent."
+    exit 1
 else
     echo "Creating VM ${VM_NAME}..."
-    limactl create                    \
+    limactl create                \
         --cpus   ${VM_CPUS}       \
         --memory ${VM_MEMORY_GB}  \
         --disk   ${VM_DISK_GB}    \
@@ -41,22 +43,16 @@ else
 fi
 
 step "starting vm ${VM_NAME}"
-limactl start ${VM_NAME}
+limactl start "${VM_NAME}"
 
 step "Setting up ${VM_NAME} for linux kernel development"
+
+# vscode launch.json
+limactl copy ./conf/launch.json "${VM_NAME}:~/"
 limactl shell ${VM_NAME} < ./installation_steps.sh | tee ${VM_NAME}.log
 
 step "Setup complete."
 
-step "Next steps:"
-
-echo "You can now connect to the VM using:"
-echo "limactl shell ${VM_NAME}" 
-echo ""
-
-echo "To connect from VisualStudio Code, use the Remote - SSH extension and connect to:"
-limactl show-ssh ${VM_NAME}
-
-step "To view the setup log, check ${VM_NAME}.log"
+step "To view the setup logs, check ${VM_NAME}.log"
 
 

@@ -1,7 +1,17 @@
 # Linux Kernel Development Environment on Mac using limactl
 
 ## Overview
-Easily setup a Linux Kernel development environment on `mac` M1 processors using [limactl](https://lima-vm.io/docs/reference/limactl/) and based on [FlorentRevest](https://github.com/FlorentRevest/linux-kernel-vscode)'s work
+
+Setup a Linux Kernel development environment on `mac` arm64 processors using [limactl](https://lima-vm.io/docs/reference/limactl/) and based on [FlorentRevest](https://github.com/FlorentRevest/linux-kernel-vscode)'s work.
+
+
+As an example, given this kernel `trace-cmd` function graph:
+
+![trace point](docs/trace_cmd.png)
+
+It will then be possible to debug the flow in [net/ipv4/tcp_v4.c](https://elixir.bootlin.com/linux/v6.11/source/net/ipv4/tcp_ipv4.c#L2172) with a breakpoint using Visual Studio Code - on your arm64 mac:
+
+![vscode debug](docs/vscode_debug.png) 
 
 ## Prerequisites
 
@@ -15,6 +25,17 @@ Easily setup a Linux Kernel development environment on `mac` M1 processors using
 ```
 ./setup_kernel_dev_env.sh
 ```
+
+The command will:
+- create a `vm` using `lima`
+  - install all the required dependencies in the `lima vm` as per [installation_steps.sh](installation_steps.sh)
+    - libraries for building the kernel
+    - [virtme-ng](https://github.com/arighi/virtme-ng): easily start the compiled kernel with qemu
+  -   clone the kernel sources in `$HOME/dev/linux`  
+  -   build the kernel using clang and `$HOME/dev/linux/vmlinux`
+
+Example run [video](docs/launch_script_x10.mp4)
+
 
 ### Configuration
 
@@ -34,15 +55,39 @@ e.g.
 ```
 VM_NAME=another_name VM_CPUS=4 ./setup_kernel_dev_env.sh
 ```
-## Debugging using gdb
 
-### Find a break point
+
+
+## VM is ready, what next?
+
+Once the script has completed successfully, you can familiarise with the kernel by adding a breakpoint and see the kernel in action.
+
+
+## Debugging using Visual Studio Code
+
+Refer to this [video](docs/debug_with_visual_studio-code.mp4) for step-by-step instructions
+
+
+### Launch Visual Studio Code
+
+#### Add a new remote connection
+
+### Find an interesting break point by looking at the net_rx_action function graph
 
 Let's find a break point in the networking stack by running a `trace-cmd`
+on [net_rx_action](https://tldp.org/HOWTO/KernelAnalysis-HOWTO-8.html)
+
+Log into the VM:
+```
+limactl shell --workdir "/tmp" $VM_NAME
+```
+
+record the function graph trace for net_rx_action
+
 ```
 sudo trace-cmd record \
     -p function_graph \
-    -g net_rx_action  \
+    -g net_rx_action   \
     -- curl -s -o /dev/null https://example.com
 ```
 
@@ -54,88 +99,49 @@ sudo trace-cmd report --align-ts| less
 
 and you'll see something like:
 ```
+          <idle>-0     [000]     0.151699: funcgraph_entry:                   |                        tcp_v4_rcv() {
+          <idle>-0     [000]     0.151699: funcgraph_entry:                   |                          tcp_inbound_hash() {
+          <idle>-0     [000]     0.151700: funcgraph_entry:        0.125 us   |                            tcp_do_parse_auth_options();
+          <idle>-0     [000]     0.151700: funcgraph_exit:         0.292 us   |                          }
+          <idle>-0     [000]     0.151700: funcgraph_entry:                   |                          sk_filter_trim_cap() {
+          <idle>-0     [000]     0.151700: funcgraph_entry:                   |                            security_sock_rcv_skb() {
+          <idle>-0     [000]     0.151701: funcgraph_entry:        0.167 us   |                              apparmor_socket_sock_rcv_skb();
+          <idle>-0     [000]     0.151701: funcgraph_exit:         0.792 us   |                            }
+          <idle>-0     [000]     0.151701: funcgraph_entry:        0.083 us   |                            __rcu_read_lock();
+          <idle>-0     [000]     0.151701: funcgraph_entry:        0.083 us   |                            __rcu_read_unlock();
+          <idle>-0     [000]     0.151701: funcgraph_exit:         1.584 us   |                          }
+          <idle>-0     [000]     0.151702: funcgraph_entry:        0.083 us   |                          tcp_v4_fill_cb();
+          <idle>-0     [000]     0.151702: funcgraph_entry:        0.083 us   |                          _raw_spin_lock();
+          <idle>-0     [000]     0.151702: funcgraph_entry:                   |                          tcp_v4_do_rcv() {
+          <idle>-0     [000]     0.151702: funcgraph_entry:                   |                            tcp_rcv_state_process() {
+          <idle>-0     [000]     0.151702: funcgraph_entry:                   |                              tcp_mstamp_refresh() {
+          <idle>-0     [000]     0.151702: funcgraph_entry:                   |                                ktime_get() {
+          <idle>-0     [000]     0.151702: funcgraph_entry:        0.083 us   |                                  arch_counter_read();
+          <idle>-0     [000]     0.151703: funcgraph_exit:         0.209 us   |                                }
+          <idle>-0     [000]     0.151703: funcgraph_exit:         0.333 us   |                              }
+          <idle>-0     [000]     0.151703: func
 cpus=6
-            curl-125402 [001]     0.000000: funcgraph_entry:                   |  net_rx_action() {
-            curl-125402 [001]     0.000000: funcgraph_entry:        0.167 us   |    __usecs_to_jiffies();
-            curl-125402 [001]     0.000001: funcgraph_entry:        0.125 us   |    _raw_spin_lock();
-            curl-125402 [001]     0.000001: funcgraph_entry:        0.083 us   |    _raw_spin_unlock();
-            curl-125402 [001]     0.000001: funcgraph_entry:                   |    napi_consume_skb() {
-            curl-125402 [001]     0.000001: funcgraph_entry:        0.083 us   |      skb_release_head_state();
-            curl-125402 [001]     0.000002: funcgraph_entry:                   |      skb_release_data() {
-            curl-125402 [001]     0.000002: funcgraph_entry:                   |        __folio_put() {
-            curl-125402 [001]     0.000002: funcgraph_entry:        0.083 us   |          __mem_cgroup_uncharge();
-            curl-125402 [001]     0.000002: funcgraph_entry:                   |          free_unref_page() {
-            curl-125402 [001]     0.000002: funcgraph_entry:        0.083 us   |            free_tail_page_prepare();
-            curl-125402 [001]     0.000002: funcgraph_entry:        0.083 us   |            free_tail_page_prepare();
-            ....
-            curl-125402 [001]     0.000004: funcgraph_exit:         1.667 us   |          }
-            curl-125402 [001]     0.000004: funcgraph_exit:         1.958 us   |        }
-            curl-125402 [001]     0.000004: funcgraph_entry:                   |        skb_free_head() {
-            curl-125402 [001]     0.000004: funcgraph_entry:        0.084 us   |          kmem_cache_free();
-            curl-125402 [001]     0.000004: funcgraph_exit:         0.250 us   |        }
-            curl-125402 [001]     0.000004: funcgraph_exit:         2.625 us   |      }
-            curl-125402 [001]     0.000004: funcgraph_entry:                   |      kfree_skbmem() {
-            curl-125402 [001]     0.000004: funcgraph_entry:        0.208 us   |        kmem_cache_free();
-            curl-125402 [001]     0.000005: funcgraph_exit:         0.375 us   |      }
-            curl-125402 [001]     0.000005: funcgraph_exit:         3.333 us   |    }
-            curl-125402 [001]     0.000005: funcgraph_entry:                   |    __napi_poll() {
-            curl-125402 [001]     0.000005: funcgraph_entry:                   |      process_backlog() {
-            curl-125402 [001]     0.000005: funcgraph_entry:        0.083 us   |        _raw_spin_lock_irq();
-            curl-125402 [001]     0.000005: funcgraph_entry:        0.083 us   |        _raw_spin_unlock_irq();
-            curl-125402 [001]     0.000005: funcgraph_entry:        0.083 us   |        __rcu_read_lock();
-            curl-125402 [001]     0.000005: funcgraph_entry:                   |        __netif_receive_skb() {
 ```
 
-We want to break on [net_rx_action](https://tldp.org/HOWTO/KernelAnalysis-HOWTO-8.html)
+`tcp_v4_rcv` is an interesting entry point to debug the tcp stack, located at [net/ipv4/tcp_v4.c](https://elixir.bootlin.com/linux/v6.11/source/net/ipv4/tcp_ipv4.c#L2172)
 
-### Launch vng
 
+### Launch virtme-ng in debug mode
+
+Log into the VM:
 ```
-limactl shell $VM_NAME <<'EOF'
+limactl shell --workdir "/tmp" $VM_NAME
+```
+
+Launch virtme-ng in debug mode
+```
 cd ~/dev/linux
 vng --debug --network user
 EOF
 ```
 
-```
-➜  scripts git:(main) ✗ limactl shell test-script-2 <<'EOF'
-cd ~/dev/linux
-vng --debug --network user
-EOF
-          _      _
-   __   _(_)_ __| |_ _ __ ___   ___       _ __   __ _
-   \ \ / / |  __| __|  _   _ \ / _ \_____|  _ \ / _  |
-    \ V /| | |  | |_| | | | | |  __/_____| | | | (_| |
-     \_/ |_|_|   \__|_| |_| |_|\___|     |_| |_|\__  |
-                                                |___/
-   kernel version: 6.11.0 aarch64
-   (CTRL+d to exit)
+A qemu instance is launched starting up the linux kernel we have just built, with debug port open on localhost:1234
 
-filippo@virtme-ng:~/dev/linux$
-```
+### Start debugging from VSCode
 
-### Launch gdb
-
-```
-limactl shell $VM_NAME
-```
-
-```
-export TERM=xterm-256color
-cd ~/dev/linux/
-gdb -tui ./vmlinux \
-  --eval-command="target remote :1234" \
-  --eval-command="break net_rx_action" \
-  --eval-command="continue"
-
-```
-
-## Debugging using Visual Studio Code
-
-### Launch Visual Studio Code
-
-### Set a remote connection
-
-### Launch vng
-
-# linux-kernel-debugging-on-mac
+Launch the `Debug kernel in virtme-ng (qemu)` debug configuration in VSCode

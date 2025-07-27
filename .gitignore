@@ -1,0 +1,50 @@
+# === Shell script artifacts ===
+*.log
+*.out
+*.bak
+*.swp
+*.tmp
+*.temp
+*.orig
+*.rej
+*~
+
+# === macOS system files ===
+.DS_Store
+
+# === Linux core dumps ===
+core
+
+# === VSCode and other IDEs ===
+.vscode/
+.idea/
+*.code-workspace
+
+# === ShellCheck or linter cache ===
+.shellcheck/
+
+# === Test results ===
+coverage/
+*.gcov
+*.gcda
+*.gcno
+
+# === Node, Python or misc (if used in your tooling) ===
+node_modules/
+dist/
+__pycache__/
+*.pyc
+
+# === Executables or compiled binaries ===
+*.exe
+*.out
+*.o
+*.so
+*.a
+*.bin
+
+# === Git-specific ===
+.git/
+
+# === Optional: lock files ===
+*.lock

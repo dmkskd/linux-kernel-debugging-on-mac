@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -euo pipefail
 
 step() {
   local message="$1"
@@ -30,8 +31,7 @@ mkdir ~/dev
 
 # sources for the current kernel versions - change as appropriate
 export kernel_version=$(echo "v$(uname -r | cut -d- -f1 | cut -d. -f1,2)")
-#
- 
+
 step "Cloning kernel version: $kernel_version"
 git clone \
     --branch $kernel_version \
@@ -42,8 +42,13 @@ step "Installing system dependencies"
 sudo apt install -y python3-pip flake8 pylint cargo rustc qemu-system-aarch64
 
 step "Installing virtme-ng" 
-git clone https://github.com/arighi/virtme-ng ~/dev/virtme-ng
- 
+
+( git clone https://github.com/arighi/virtme-ng ~/dev/virtme-ng && cd ~/dev/virtme-ng && git checkout 094ddac ) || {
+    echo "Failed to clone virtme-ng repository."
+    exit 1
+}
+
+
 step "Installing vng python dependencies"
 cd ~/dev/virtme-ng
 BUILD_VIRTME_NG_INIT=1 pip3 install . --break-system-packages
@@ -64,6 +69,7 @@ sudo apt install -y code gdb-multiarch ccache clang clangd llvm lld \
                  libelf-dev bison bindfs mmdebstrap proot systemtap flex yacc bc debian-archive-keyring
 
 step "Installing https://github.com/FlorentRevest/linux-kernel-vscode"
+
 cd ~/dev/linux
 git clone https://github.com/FlorentRevest/linux-kernel-vscode .vscode/
 
@@ -72,12 +78,15 @@ sed -i 's/^.*TARGET_ARCH=arm64/TARGET_ARCH=arm64/' .vscode/local.sh
 
 .vscode/tasks.sh update  # Needs to be run once to generate settings.json
 
+step "copy vscode launch.json"
+cp ~/launch.json .vscode/launch.json
+
 # remove any previous config
 rm -f .config
 
 step "compiling the kernel - this may take a while"
 # in case you are using ghossty
-TERM=xterm-256color
+export TERM=xterm-256color
 
 cd ~/dev/linux
 .vscode/tasks.sh build  # build the kernel

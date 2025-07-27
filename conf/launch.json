@@ -1,0 +1,121 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug kernel in virtme-ng (qemu)",
+      "type": "cppdbg",
+      "request": "launch",
+      "MIMode": "gdb",
+      "miDebuggerServerAddress": "localhost:1234",
+      "miDebuggerPath": "/usr/bin/gdb",
+      "cwd": "${workspaceFolder}",
+      "program": "${workspaceFolder}/vmlinux",
+      "setupCommands": [
+        {
+          "description": "Enable pretty-printing",
+          "text": "-enable-pretty-printing",
+          "ignoreFailures": true
+        }
+      ],
+      "stopAtEntry": true,
+      "externalConsole": false
+    },
+    {
+      "name": "Start and debug kernel in a VM",
+      "type": "cppdbg",
+      "request": "launch",
+      "preLaunchTask": "Start virtual machine",
+      "internalConsoleOptions": "neverOpen",
+
+      "miDebuggerPath": "gdb-multiarch",
+      "miDebuggerServerAddress": "localhost:1234",
+      "setupCommands": [
+        {
+          "description": "Give some time for the VM to spin-up",
+          "text": "-interpreter-exec console \"shell ${workspaceFolder}/.vscode/tasks.sh wait-for-vm\"",
+          "ignoreFailures": false
+        },
+        {
+          "description": "Enable autoloading of Linux GDB scripts",
+          "text": "add-auto-load-safe-path ${workspaceFolder}/scripts/gdb",
+          "ignoreFailures": true
+        },
+        {
+          "description": "Format Locals as HEX by default",
+          "text": "set output-radix 16",
+          "ignoreFailures": true
+        }
+      ],
+
+      "cwd": "${workspaceFolder}",
+      "program": "${workspaceFolder}/vmlinux",
+
+      "hardwareBreakpoints": { "require": true }
+    },
+    {
+      "name": "Start and debug kernel in a VM from early-boot",
+      "type": "cppdbg",
+      "request": "launch",
+      "preLaunchTask": "Start virtual machine waiting for debugger",
+      "internalConsoleOptions": "neverOpen",
+
+      "miDebuggerPath": "gdb-multiarch",
+      "miDebuggerServerAddress": "localhost:1234",
+      "setupCommands": [
+        {
+          "description": "Give some time for the VM to spin-up",
+          "text": "-interpreter-exec console \"shell ${workspaceFolder}/.vscode/tasks.sh wait-for-vm\"",
+          "ignoreFailures": true
+        },
+        {
+          "description": "Enable autoloading of Linux GDB scripts",
+          "text": "add-auto-load-safe-path ${workspaceFolder}/scripts/gdb",
+          "ignoreFailures": true
+        },
+        {
+          "description": "Format Locals as HEX by default",
+          "text": "set output-radix 16",
+          "ignoreFailures": true
+        }
+      ],
+
+      "cwd": "${workspaceFolder}",
+      "program": "${workspaceFolder}/vmlinux",
+
+      "hardwareBreakpoints": {
+        "require": true
+      }
+    },
+    {
+      "name": "Debug kernel in an already-running VM",
+      "type": "cppdbg",
+      "request": "launch",
+      "internalConsoleOptions": "neverOpen",
+
+      "miDebuggerPath": "gdb-multiarch",
+      "miDebuggerServerAddress": "localhost:1234",
+      "setupCommands": [
+        {
+          "description": "Wait for the VM to spin-up",
+          "text": "-interpreter-exec console \"shell ${workspaceFolder}/.vscode/tasks.sh wait-for-vm\"",
+          "ignoreFailures": false
+        },
+        {
+          "description": "Enable autoloading of Linux GDB scripts",
+          "text": "add-auto-load-safe-path ${workspaceFolder}/scripts/gdb",
+          "ignoreFailures": true
+        },
+        {
+          "description": "Format Locals as HEX by default",
+          "text": "set output-radix 16",
+          "ignoreFailures": true
+        }
+      ],
+
+      "cwd": "${workspaceFolder}",
+      "program": "${workspaceFolder}/vmlinux",
+
+      "hardwareBreakpoints": { "require": true }
+    }
+  ]
+}
