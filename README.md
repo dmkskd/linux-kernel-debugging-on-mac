@@ -65,12 +65,16 @@ Once the script has completed successfully, you can familiarise with the kernel 
 
 ## Debugging using Visual Studio Code
 
-Refer to this [video](docs/debug_with_visual_studio-code.mp4) for step-by-step instructions
-
+Please refer to this [video](docs/debug_with_visual_studio-code.mp4) for step-by-step instructions
 
 ### Launch Visual Studio Code
 
 #### Add a new remote connection
+
+```
+# retrieve the SSH Connection Command to paste in VSCode
+limactl show-ssh $VM_NAME
+```
 
 ### Find an interesting break point by looking at the net_rx_action function graph
 
@@ -137,7 +141,6 @@ Launch virtme-ng in debug mode
 ```
 cd ~/dev/linux
 vng --debug --network user
-EOF
 ```
 
 A qemu instance is launched starting up the linux kernel we have just built, with debug port open on localhost:1234
