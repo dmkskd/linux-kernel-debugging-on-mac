@@ -4,14 +4,14 @@
 
 Setup a Linux Kernel development environment on `mac` arm64 processors using [limactl](https://lima-vm.io/docs/reference/limactl/) and based on [FlorentRevest](https://github.com/FlorentRevest/linux-kernel-vscode)'s work.
 
-
 As an example, given this kernel `trace-cmd` function graph:
 
 ![trace point](docs/trace_cmd.png)
 
-It will then be possible to follow the flow in [net/ipv4/tcp_v4.c](https://elixir.bootlin.com/linux/v6.11/source/net/ipv4/tcp_ipv4.c#L2172) with a breakpoint using Visual Studio Code - on your arm64 mac:
+It will then be possible to follow the flow in the network stack [net/ipv4/tcp_v4.c](https://elixir.bootlin.com/linux/v6.11/source/net/ipv4/tcp_ipv4.c#L2172) with a breakpoint using Visual Studio Code - on your arm64 mac:
 
-![vscode debug](docs/vscode_debug.png) 
+![vscode debug](docs/vscode_debug.png)
+
 
 ## Prerequisites
 
