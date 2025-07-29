@@ -31,8 +31,9 @@ The command will:
   - install all the required dependencies in the `lima vm` as per [installation_steps.sh](installation_steps.sh)
     - libraries for building the kernel
     - [virtme-ng](https://github.com/arighi/virtme-ng): easily start the compiled kernel with qemu
-  -   clone the kernel sources in `$HOME/dev/linux`  
-  -   build the kernel using clang and `$HOME/dev/linux/vmlinux`
+  -   clone the kernel sources in `$HOME/dev/linux`
+  -   build the kernel using clang - __this can take up to 1 hour!__
+  -   produce a `vmlinux` file in `$HOME/dev/linux/vmlinux` that can be used for debugging
 
 Example run [video](docs/launch_script_x10.mp4)
 
