@@ -35,7 +35,7 @@ The command will:
   -   build the kernel using clang - __this can take up to 1 hour!__
   -   produce a `vmlinux` file in `$HOME/dev/linux/vmlinux` that can be used for debugging
 
-Example run [video](docs/launch_script_x10.mp4)
+https://github.com/user-attachments/assets/ffd4b195-3e81-4a65-beda-1a6c41748fc0
 
 
 ### Configuration
@@ -66,7 +66,11 @@ Once the script has completed successfully, you can familiarise with the kernel 
 
 ## Debugging using Visual Studio Code
 
-**Please refer to this [video](docs/debug_with_visual_studio-code.mp4) for step-by-step instructions**. In the video, instructions on how to configure the remote to dev/linux are missing and screenshots are provided.
+**Please refer to this for step-by-step instructions**.
+
+https://github.com/user-attachments/assets/7c9f9ef4-ab70-45b7-9dc8-5e6f95546561
+
+In the video, instructions on how to configure the remote to dev/linux are missing and screenshots are provided.
 
 ### Launch Visual Studio Code
 
