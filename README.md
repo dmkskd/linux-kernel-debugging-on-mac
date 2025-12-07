@@ -44,7 +44,7 @@ Default values
 
 ```
 VM_NAME=kernel-dev-vm
-VM_TEMPLATE=ubuntu-24.10
+VM_TEMPLATE=ubuntu-25.10
 VM_CPUS=6
 VM_MEMORY_GB=8
 VM_DISK_GB=50
